@@ -602,12 +602,26 @@
             container.innerHTML = '';
             signature.textContent = '';
 
-            let lineIndex = 0;
-            const lineDelay = 800;
+            // Объединяем все строки в единый текст
+            const fullText = letterLines.join(' ');
+            const p = document.createElement('p');
+            p.style.margin = '0';
+            p.style.lineHeight = '1.6';
+            p.style.color = '#555';
+            p.style.fontSize = '0.95rem';
+            p.style.textAlign = 'left';
+            container.appendChild(p);
+
+            let charIndex = 0;
             const charDelay = 30;
 
-            function printLine() {
-                if (lineIndex >= letterLines.length) {
+            function typeChar() {
+                if (charIndex < fullText.length) {
+                    p.textContent += fullText[charIndex];
+                    charIndex++;
+                    setTimeout(typeChar, charDelay);
+                } else {
+                    // После завершения печатания показываем подпись
                     setTimeout(() => {
                         signature.textContent = signatureText;
                         signature.style.opacity = 0;
@@ -615,33 +629,10 @@
                         signature.style.transition = 'opacity 0.6s ease';
                         signature.style.opacity = 1;
                     }, 600);
-                    return;
                 }
-
-                const line = letterLines[lineIndex];
-                const p = document.createElement('p');
-                p.style.margin = '0 0 12px 0';
-                p.style.lineHeight = '1.6';
-                p.style.color = '#555';
-                p.style.fontSize = '0.95rem';
-                container.appendChild(p);
-
-                let charIndex = 0;
-
-                function typeChar() {
-                    if (charIndex < line.length) {
-                        p.textContent += line[charIndex];
-                        charIndex++;
-                        setTimeout(typeChar, charDelay);
-                    }
-                }
-
-                typeChar();
-                lineIndex++;
-                setTimeout(printLine, lineDelay);
             }
 
-            printLine();
+            typeChar();
         }
 
         // === Кнопка «Далее» при клике превращается в текст ===
