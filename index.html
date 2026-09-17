@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Сюрприз для тебя моя зайка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(160deg, #4a0e7a 0%, #7b2cbf 25%, #9d4edd 50%, #c77dff 75%, #e0aaff 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* === ГЛАВНЫЙ ЭКРАН === */
+        .main-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 420px;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 1.6rem;
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 0 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #ff99ac 100%);
+            color: #fff;
+            border: none;
+            padding: 16px 50px;
+            font-size: 1.15rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 106, 136, 0.5);
+            transition: transform 0.2s;
+            font-weight: 600;
+            margin-bottom: 80px;
+            width: 100%;
+            max-width: 280px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-yes:active {
+            transform: scale(0.97);
+        }
+
+        .btn-no {
+            background-color: #1a1a1a;
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 16px 50px;
+            font-size: 1.15rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            font-weight: 600;
+            width: 100%;
+            max-width: 280px;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.2s;
+        }
+
+        .btn-no:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-no.escaped {
+            position: fixed;
+            width: auto;
+            max-width: 260px;
+            transition: left 0.3s ease, top 0.3s ease;
+        }
+
+        /* === ЭКРАН ВОПРОСА === */
+        .question-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            z-index: 50;
+            padding: 20px;
+        }
+
+        .question-screen.active {
+            display: flex;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px 25px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .question-title {
+            color: #fff;
+            font-size: 1.3rem;
+            margin-bottom: 28px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            outline: none;
+            text-align: center;
+            margin-bottom: 18px;
+            -webkit-backdrop-filter: blur(5px);
+            transition: border-color 0.3s;
+        }
+
+        .answer-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .answer-input:focus {
+            border-color: #ff99ac;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #ff99ac 100%);
+            color: #fff;
+            border: none;
+            padding: 14px 50px;
+            font-size: 1.05rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 106, 136, 0.5);
+            font-weight: 600;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.96);
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-12px); }
+            40% { transform: translateX(12px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+
+        /* === КОНВЕРТ === */
+        .envelope-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            z-index: 60;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .envelope-screen.active {
+            display: flex;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .envelope-wrap {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .env-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f8e9d2 0%, #f0d9b5 100%);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.8s ease-out;
+        }
+
+        .env-letter {
+            position: absolute;
+            width: 94%;
+            left: 3%;
+            top: 12px;
+            background: #fff;
+            border-radius: 6px;
+            padding: 25px 24px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1;
+            transform: translateY(0);
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+        }
+
+        .envelope-screen.opened .env-letter {
+            transform: translateY(-300px);
+            opacity: 1;
+            transition: transform 1s ease-out 0.6s, opacity 0.3s ease-out 0.6s;
+        }
+
+        .env-letter h2 {
+            color: #7b2cbf;
+            font-size: 1.25rem;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .env-letter p {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .env-letter .signature {
+            margin-top: 16px;
+            text-align: right;
+            font-style: italic;
+            color: #9d4edd;
+            font-size: 0.9rem;
+        }
+
+        .env-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 0 0 8px 8px;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .env-front::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 220px solid transparent;
+            border-right: 220px solid transparent;
+            border-bottom: 125px solid #e8d5a8;
+        }
+
+        .env-front::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 125px;
+            background: linear-gradient(135deg, #e8d5a8 0%, #d4be88 100%);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .env-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 125px;
+            background: linear-gradient(135deg, #f0d9b5 0%, #e8c89a 100%);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            z-index: 4;
+            transform-origin: top center;
+            transition: transform 0.7s ease-in-out, opacity 0.8s ease-out;
+        }
+
+        .envelope-screen.opened .env-flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+
+        .env-seal {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #c77dff 0%, #9d4edd 100%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+            transition: opacity 0.3s;
+        }
+
+        .envelope-screen.opened .env-seal {
+            opacity: 0;
+            transition: opacity 0.3s ease-out 0.2s;
+        }
+
+        .env-seal::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 0;
+            background: rgba(255, 255, 255, 0.8);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+        }
+
+        .envelope-screen.cracking .env-seal::after {
+            animation: crack 0.4s ease-out forwards;
+        }
+
+        @keyframes crack {
+            0% { height: 0; width: 2px; }
+            50% { height: 36px; width: 2px; }
+            100% { height: 36px; width: 36px; opacity: 0; }
+        }
+
+        .envelope-screen.cracking .env-seal {
+            animation: sealBreak 0.5s ease-out;
+        }
+
+        @keyframes sealBreak {
+            0% { transform: translateX(-50%) scale(1); }
+            30% { transform: translateX(-50%) scale(1.15); }
+            100% { transform: translateX(-50%) scale(0.8); opacity: 0; }
+        }
+
+        /* === РАСТВОРЕНИЕ КОНВЕРТА === */
+        .envelope-screen.envelope-hidden .env-back,
+        .envelope-screen.envelope-hidden .env-front,
+        .envelope-screen.envelope-hidden .env-flap {
+            opacity: 0;
+        }
+
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 200;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.3;
+            pointer-events: none;
+            animation: floatUp 9s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg) scale(1); }
+            50% { transform: translateY(50vh) rotate(180deg) scale(1.2); }
+            100% { transform: translateY(-15vh) rotate(360deg) scale(1); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.7) translateX(-50%); }
+            100% { opacity: 1; transform: scale(1) translateX(-50%); }
+        }
+
+        /* === КНОПКА "ДАЛЕЕ" === */
+        .btn-next {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: #7b2cbf;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            font-weight: 600;
+            z-index: 70;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .btn-next.transformed {
+            background: transparent;
+            color: #fff;
+            box-shadow: none;
+            border: 2px solid #fff;
+            animation: popIn 0.4s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Сердечки на фоне -->
+    <div id="hearts"></div>
+
+    <!-- Главный экран -->
+    <div class="main-screen" id="mainScreen">
+        <h1>Сюрприз для моей любимой,<br>выбирай кнопку </h1>
+        <button class="btn-yes" onclick="goToQuestion()">Да, да, хочу!</button>
+        <button class="btn-no" id="noBtn" onclick="runAway(event)">Не, не хочу</button>
+    </div>
+
+    <!-- Экран с вопросом -->
+    <div class="question-screen" id="questionScreen">
+        <div class="question-card">
+            <div class="question-title">Как зовут нашего<br>первого ребёнка? 🤔</div>
+            <input type="text" class="answer-input" id="answerInput" placeholder="Напиши ответ..." autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button class="submit-btn" id="submitBtn" onclick="checkAnswer()">Отправить</button>
+        </div>
+    </div>
+
+    <!-- Конверт -->
+    <div class="envelope-screen" id="envelopeScreen">
+        <div class="envelope-wrap">
+            <div class="envelope">
+                <div class="env-back"></div>
+                <div class="env-letter">
+                    <h2 id="letter-title">С Днём Рождения, моя дорогая и самая любимая! ❤️</h2>
+                    <div id="letter-content" class="letter-text"></div>
+                    <div class="signature" id="letter-signature"></div>
+                </div>
+                <div class="env-front"></div>
+                <div class="env-flap"></div>
+                <div class="env-seal">💜</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопка «Далее» -->
+    <button id="nextBtn" class="btn-next" style="display: none;">Далее</button>
+
+    <script>
+        // === Убегающая кнопка ===
+        function runAway(e) {
+            e.preventDefault();
+            const btn = document.getElementById('noBtn');
+            btn.textContent = 'Не угадала';
+            btn.classList.add('escaped');
+
+            const btnW = btn.offsetWidth;
+            const btnH = btn.offsetHeight;
+            const maxX = window.innerWidth - btnW - 20;
+            const maxY = window.innerHeight - btnH - 20;
+
+            const randomX = Math.floor(Math.random() * (maxX - 20)) + 20;
+            const randomY = Math.floor(Math.random() * (maxY - 20)) + 20;
+
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+        }
+
+        // === Переход к вопросу ===
+        function goToQuestion() {
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('questionScreen').classList.add('active');
+            setTimeout(() => document.getElementById('answerInput').focus(), 400);
+        }
+
+        // === Проверка ответа ===
+        function checkAnswer() {
+            const input = document.getElementById('answerInput');
+            const btn = document.getElementById('submitBtn');
+            const answer = input.value.trim().toLowerCase();
+
+            if (answer === 'няша') {
+                document.getElementById('questionScreen').classList.remove('active');
+                document.getElementById('envelopeScreen').classList.add('active');
+                setTimeout(startOpeningSequence, 500);
+            } else {
+                btn.classList.remove('shake');
+                void btn.offsetWidth;
+                btn.classList.add('shake');
+                input.value = '';
+                input.placeholder = 'Неправильно... Попробуй ещё!';
+                setTimeout(() => input.focus(), 100);
+            }
+        }
+
+        // === Ввод по Enter ===
+        document.getElementById('answerInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') checkAnswer();
+        });
+
+        // === Открытие конверта ===
+        function startOpeningSequence() {
+            launchConfetti();
+            const env = document.getElementById('envelopeScreen');
+            setTimeout(() => env.classList.add('cracking'), 400);
+            setTimeout(() => env.classList.add('opened'), 900);
+
+            // Запускаем эффект печатания
+            setTimeout(typeWriter, 1200);
+
+            // Конверт растворяется после открытия
+            setTimeout(() => env.classList.add('envelope-hidden'), 2200);
+
+            // Кнопка «Далее» появляется
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.style.display = 'block';
+                nextBtn.style.opacity = 0;
+                void nextBtn.offsetWidth;
+                nextBtn.style.transition = 'opacity 0.6s ease';
+                nextBtn.style.opacity = 1;
+            }
+        }
+
+        // === Текст письма для печатания ===
+        const letterLines = [
+            "Знаешь, ты для меня чем-то гораздо большим, чем просто любимым человеком.",
+            "Ты — мой личный островок спокойствия, моё «домой», где бы мы ни находились.",
+            "С тобой мне не нужно носить маски или казаться кем-то другим — я просто дышу рядом с тобой.",
+            "И если вдруг на тебя навалятся сомнения или покажется, что всё идёт не так — просто вспомни, что для меня ты самая ценная, самая желанная и бесконечно важная.",
+            "Я искренне благодарен судьбе за каждый наш день, за твой смех и за то, что именно ты идёшь со мной за руку.",
+            "Ты — самое дорогое, что есть в моей жизни.",
+            "Каждый день с тобой — это подарок.",
+            "Пусть твои глаза всегда сияют, а улыбка не исчезает с лица.",
+            "Ты делаешь меня лучше и счастливее.",
+            "С днём рождения, моя любимая, самая добрая, самая красивая, самая умная и бесконечно мной любимая девочка ❤️❤️❤️"
+        ];
+
+        const signatureText = "— Твой Дебил, ебаный";
+
+        function typeWriter() {
+            const container = document.getElementById('letter-content');
+            const signature = document.getElementById('letter-signature');
+
+            container.innerHTML = '';
+            signature.textContent = '';
+
+            let lineIndex = 0;
+            const lineDelay = 800;
+            const charDelay = 30;
+
+            function printLine() {
+                if (lineIndex >= letterLines.length) {
+                    setTimeout(() => {
+                        signature.textContent = signatureText;
+                        signature.style.opacity = 0;
+                        void signature.offsetWidth;
+                        signature.style.transition = 'opacity 0.6s ease';
+                        signature.style.opacity = 1;
+                    }, 600);
+                    return;
+                }
+
+                const line = letterLines[lineIndex];
+                const p = document.createElement('p');
+                p.style.margin = '0 0 12px 0';
+                p.style.lineHeight = '1.6';
+                p.style.color = '#555';
+                p.style.fontSize = '0.95rem';
+                container.appendChild(p);
+
+                let charIndex = 0;
+
+                function typeChar() {
+                    if (charIndex < line.length) {
+                        p.textContent += line[charIndex];
+                        charIndex++;
+                        setTimeout(typeChar, charDelay);
+                    }
+                }
+
+                typeChar();
+                lineIndex++;
+                setTimeout(printLine, lineDelay);
+            }
+
+            printLine();
+        }
+
+        // === Кнопка «Далее» при клике превращается в текст ===
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            const btn = document.getElementById('nextBtn');
+            btn.textContent = 'Выходи моя принцесса, я приехал';
+            btn.classList.add('transformed');
+        });
+
+        // === Конфетти из 4 углов ===
+        function launchConfetti() {
+            const colors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4d96ff', '#c77dff', '#ff9a8b', '#ff6a88', '#fff'];
+            const corners = [
+                { x: 0, y: 0 },
+                { x: window.innerWidth, y: 0 },
+                { x: 0, y: window.innerHeight },
+                { x: window.innerWidth, y: window.innerHeight }
+            ];
+
+            corners.forEach(corner => {
+                for (let i = 0; i < 35; i++) {
+                    createConfettiPiece(corner.x, corner.y, colors);
+                }
+            });
+        }
+
+        function createConfettiPiece(startX, startY, colors) {
+            const piece = document.createElement('div');
+            piece.classList.add('confetti-piece');
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            piece.style.left = startX + 'px';
+            piece.style.top = startY + 'px';
+            document.body.appendChild(piece);
+
+            const angle = Math.atan2(
+                window.innerHeight / 2 - startY,
+                window.innerWidth / 2 - startX
+            );
+            const speed = Math.random() * 250 + 150;
+            const dx = Math.cos(angle) * speed + (Math.random() - 0.5) * 200;
+            const dy = Math.sin(angle) * speed + (Math.random() - 0.5) * 200;
+
+            piece.animate([
+                { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+                { transform: 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + (Math.random() * 720) + 'deg)', opacity: 0 }
+            ], {
+                duration: Math.random() * 1500 + 1500,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                fill: 'forwards'
+            });
+
+            setTimeout(() => piece.remove(), 3000);
+        }
+
+        // === Сердечки ===
+        const heartsContainer = document.getElementById('hearts');
+        const heartEmojis = ['❤️', '💜', '💙', '💕', '💖'];
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 2 + 6) + 's';
+            heart.style.fontSize = (Math.random() * 15 + 20) + 'px';
+            heartsContainer.appendChild(heart);
+            setTimeout(() => heart.remove(), 9000);
+        }
+
+        setInterval(createHeart, 300);
+    </script>
+</body>
+</html>
