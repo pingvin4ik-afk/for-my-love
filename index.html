@@ -248,6 +248,9 @@
             transform: translateY(0);
             transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             opacity: 0;
+            max-height: 72vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .envelope-screen.opened .env-letter {
@@ -602,26 +605,29 @@
             container.innerHTML = '';
             signature.textContent = '';
 
-            // Объединяем все строки в единый текст
             const fullText = letterLines.join(' ');
             const p = document.createElement('p');
-            p.style.margin = '0';
-            p.style.lineHeight = '1.6';
+            p.style.margin = '0 0 14px 0';
+            p.style.lineHeight = '1.8';
             p.style.color = '#555';
-            p.style.fontSize = '0.95rem';
+            p.style.fontSize = '0.88rem';
             p.style.textAlign = 'left';
             container.appendChild(p);
 
             let charIndex = 0;
-            const charDelay = 30;
+            const charDelay = 25;
 
             function typeChar() {
                 if (charIndex < fullText.length) {
                     p.textContent += fullText[charIndex];
                     charIndex++;
+                    // Автопрокрутка вниз
+                    const letter = document.querySelector('.env-letter');
+                    if (letter) {
+                        letter.scrollTop = letter.scrollHeight;
+                    }
                     setTimeout(typeChar, charDelay);
                 } else {
-                    // После завершения печатания показываем подпись
                     setTimeout(() => {
                         signature.textContent = signatureText;
                         signature.style.opacity = 0;
